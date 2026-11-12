@@ -103,3 +103,4 @@ def load_sql_templates():
         with open(path, "r") as f:
             out[label] = f.read()
     return out
+# v2 sync
