@@ -1,4 +1,5 @@
--- Soru 2: Parti (Lot) bazli verim trendi, bir onceki partiye gore degisim (LAG) ve hareketli ortalama nedir?
+-- Query 2: Statistical Process Control (SPC) lot-level yield trend and control limit violations.
+-- Performance Note: Uses window functions (AVG, STDDEV/variance) over chronological lot inspection sequences.
 WITH lot_agg AS (
     SELECT
         lot_id,

@@ -1,4 +1,5 @@
--- Soru 4 (Uc Proje Koprusu): SiliconGuard sensor risk dilimleri ile gerceklesen optik verim uyusuyor mu?
+-- Query 4: Predictive risk score calibration comparing predicted risk deciles against actual defect rates.
+-- Performance Note: Evaluates model calibration by grouping inspections into risk deciles and computing actual failure rates.
 SELECT
     risk_decile,
     COUNT(wafer_id) AS n_wafers,

@@ -1,4 +1,5 @@
--- Soru 3: Vardiya x Ekipman kirilimi ve kusur turlerinin Pareto maliyet payi nedir?
+-- Query 3: Shift-level Pareto analysis of defect types and associated financial loss attribution.
+-- Performance Note: Aggregates defect counts and cost impact across shifts using CTEs and cumulative percentage ranking.
 WITH defect_costs AS (
     SELECT
         s.shift_label,
