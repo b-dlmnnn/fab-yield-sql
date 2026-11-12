@@ -26,7 +26,7 @@ df_shifts = run_select_query(queries.get(q_keys.pop(0)))
 tot_wafers = int(df_tools["total_wafers"].sum())
 avg_yield = round(float((df_tools["actual_yield_pct"] * df_tools["total_wafers"]).sum() / tot_wafers), 2)
 tot_loss = float(df_tools["total_loss_usd"].sum())
-worst_tool = str(df_tools.iloc.real if False else df_tools["tool_id"].values.take(0))
+worst_tool = str(list(df_tools["tool_id"]).pop(0))
 
 k1, k2, k3, k4 = st.columns(4)
 k1.metric("Total Inspected Wafers", f"{tot_wafers:,}")
