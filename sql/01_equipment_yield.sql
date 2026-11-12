@@ -1,6 +1,5 @@
 -- Query 1: What are the actual First-Pass Yield (FPY), target variance, rank (RANK), and total cost per equipment?
 -- Performance Note: Uses INDEX SCAN via idx_fact_tool instead of a full table scan on EXPLAIN QUERY PLAN.
- yerine INDEX SCAN kullanilir.
 WITH equip_stats AS (
     SELECT
         e.tool_id,
