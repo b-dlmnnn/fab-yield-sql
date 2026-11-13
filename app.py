@@ -76,7 +76,12 @@ k2.metric("First-Pass Yield (FPY)", f"{overall_yield}%")
 k3.metric("Total Cost Attribution", f"\\${tot_cost:,.0f}")
 k4.metric("Primary Bottleneck", f"{worst_row['tool_id']}", delta=f"p = {worst_row['p_value']} vs. peer tools", delta_color="inverse")
 
-tab_dash, tab_bridge, tab_sql = st.tabs(list(("1. Yield Attribution & SPC Control", "2. Three-Project Risk Calibration Bridge", "3. Read-Only SQL Workbench & Schema")))
+tab_dash, tab_bridge, tab_sql, tab_stream = st.tabs([
+    "1. Yield Attribution & SPC Control",
+    "2. Three-Project Bridge & Cost Calibration",
+    "3. Read-Only SQL Workbench & Schema",
+    "4. Real-Time Streaming & Unified Command Center"
+])
 
 with tab_dash:
     c1, c2 = st.columns(2)
@@ -149,3 +154,74 @@ with tab_sql:
             st.dataframe(out_df, use_container_width=True, hide_index=True)
         except Exception as err:
             st.error(str(err))
+            # ==============================================================================
+# TAB 4: REAL-TIME STREAMING & UNIFIED 3-PROJECT COMMAND CENTER (FASTAPI + SQL)
+# ==============================================================================
+import numpy as np
+from api_stream import WaferEvent, evaluate_wafer_stream
+
+with tab_stream:
+    st.subheader("🌐 Unified 3-Project Real-Time Telemetry & Streaming Command Center")
+    st.caption(
+        "Simulates live FastAPI streaming events fusing SiliconGuard AI (sensor risk) "
+        "and Vision Inspector (optical defect count) into automated Fab Yield SQL line decisions."
+    )
+
+    c_s1, c_s2, c_s3 = st.columns(3)
+    with c_s1:
+        stream_tool = st.selectbox("Active Equipment (Tool ID)", ["CVD-03", "ETCH-01", "LITHO-02"])
+    with c_s2:
+        stream_batch_size = st.slider("Simulated Live Stream Events (Wafers)", min_value=5, max_value=30, value=12)
+    with c_s3:
+        stream_seed = st.number_input("Telemetry Stream Seed", min_value=1, max_value=999, value=42)
+
+    if st.button("▶ Simulate Live FastAPI Telemetry Stream"):
+        rng = np.random.default_rng(int(stream_seed))
+        events_log = []
+
+        for idx in range(1, stream_batch_size + 1):
+            w_id = f"WFR-LIVE-{1000 + idx}"
+            # SiliconGuard AI'dan gelen canli sensor risk olasiligi (0.0 - 1.0)
+            s_risk = round(float(rng.uniform(0.05, 0.95)), 3)
+            # Vision Inspector'dan gelen canli kamera kusur sayisi
+            v_defects = int(rng.choice([0, 0, 0, 1, 2, 3]))
+
+            # FastAPI uzerindeki gercek zamanli capraz dogrulama motorunu cagir
+            event_payload = WaferEvent(
+                wafer_id=w_id,
+                tool_id=stream_tool,
+                sensor_risk_score=s_risk,
+                vision_defect_count=v_defects
+            )
+            api_response = evaluate_wafer_stream(event_payload)
+            events_log.append({
+                "Timestamp (UTC)": api_response["timestamp"][11:19],
+                "Wafer ID": api_response["wafer_id"],
+                "Tool ID": api_response["tool_id"],
+                "SiliconGuard Sensor Risk": s_risk,
+                "Vision Optical Defects": v_defects,
+                "Unified API Decision": api_response["decision"],
+                "Automated Root Cause": api_response["root_cause"]
+            })
+
+        stream_df = pd.DataFrame(events_log)
+
+        halts = int((stream_df["Unified API Decision"] == "CRITICAL_HALT_AND_QUARANTINE").sum())
+        flags = int((stream_df["Unified API Decision"] == "SECONDARY_INSPECTION_FLAG").sum())
+        passes = int((stream_df["Unified API Decision"] == "PASS_TO_NEXT_STAGE").sum())
+
+        m1, m2, m3 = st.columns(3)
+        m1.metric("🛑 Critical Line Halts (Dual-Modal)", f"{halts} Wafers")
+        m2.metric("⚠️ Secondary Lab Flags (Single-Modal)", f"{flags} Wafers")
+        m3.metric("✅ Passed to Next Stage", f"{passes} Wafers")
+
+        st.dataframe(stream_df, use_container_width=True, hide_index=True)
+
+        if halts > 0:
+            st.error(
+                f"🚨 **AUTOMATED LINE INTERLOCK TRIGGERED:** {halts} wafer(s) failed both "
+                f"SiliconGuard AI sensor screening and Vision Inspector optical checks on **{stream_tool}**."
+            )
+        else:
+            st.success(f"✅ **STREAM NOMINAL:** No dual-modal failures detected on **{stream_tool}**.")
+
